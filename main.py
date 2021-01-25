@@ -1,16 +1,83 @@
 import pygame
 import random
+from pygame import mixer
+
+level = 2
+width = 500
+height = 500
+
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GRAY = (128, 128, 128)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
 colors = [
-    (0, 0, 0),
+    None,
     (0, 255, 255),
-    (255, 0, 0),
-    (0, 255, 0),
-    (0, 0, 255),
+    RED,
+    GREEN,
+    BLUE,
     (255, 165, 0),
     (138, 43, 226),
     (255, 255, 0),
 ]
+
+
+
+class Menu:
+
+    def main_menu():
+        menu=True
+
+        global level
+
+        while menu:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        if level > 1:
+                            level -= 1
+                    elif event.key == pygame.K_DOWN:
+                        if level < 3:
+                            level += 1
+                    if event.key == pygame.K_RETURN:
+                        menu = False
+                        break;
+
+            screen.fill(BLACK)
+            text_menu = font2.render("Choose difficulty:", True, BLUE)
+            if level == 1:
+                text_easy = font.render("Easy", True, WHITE)
+            else:
+                text_easy = font.render("Easy", True, GRAY)
+            if level == 2:
+                text_normal = font.render("Normal", True, WHITE)
+            else:
+                text_normal = font.render("Normal", True, GRAY)
+            if level == 3:
+                text_hard = font.render("Hard", True, WHITE)
+            else:
+                text_hard = font.render("Hard", True, GRAY)
+
+
+            menu_rect = text_menu.get_rect()
+            easy_rect = text_easy.get_rect()
+            normal_rect = text_normal.get_rect()
+            hard_rect = text_hard.get_rect()
+
+
+            # Main Menu Text
+            screen.blit(text_menu, (width/2 - (menu_rect[2]/2), 150))
+            screen.blit(text_easy, (width/2 - (easy_rect[2]/2) , 200))
+            screen.blit(text_normal, (width/2 - (normal_rect[2]/2) , 225))
+            screen.blit(text_hard, (width/2 - (hard_rect[2]/2) , 250))
+            pygame.display.update()
+            clock.tick(fps)
 
 
 class Figure:
@@ -41,7 +108,6 @@ class Figure:
 
 
 class Tetris:
-    level = 2
     score = 0
     state = "start"
     field = []
@@ -125,11 +191,14 @@ class Tetris:
             self.state = "gameover"
 
     def go_side(self, dx):
+        move_sound = mixer.Sound("sounds\\move.wav")
+        mixer.Sound.set_volume(move_sound, 0.04)
         if game.state != "gameover":
             old_x = self.figure.x
             self.figure.x += dx
             if self.intersects():
                 self.figure.x = old_x
+            move_sound.play()
 
     def rotate(self):
         old_rotation = self.figure.rotation
@@ -137,26 +206,34 @@ class Tetris:
         if self.intersects():
             self.figure.rotation = old_rotation
 
+    def music(self):
+        mixer.music.set_volume(0.04)
+        mixer.music.load("sounds\\music.wav")
+        mixer.music.play(-1)
+
+
 
 # Initialize the game engine
 pygame.init()
 
-# Define some colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAY = (128, 128, 128)
-
-size = (500, 500)
-screen = pygame.display.set_mode(size)
-
+screen = pygame.display.set_mode((width,height))
 pygame.display.set_caption("Tetris")
+
+font = pygame.font.SysFont('Calibri', 25, True, False)
+font1 = pygame.font.SysFont('Calibri', 50, True, False)
+font2 = pygame.font.SysFont('Calibri', 35, True, False)
 
 # Loop until the user clicks the close button.
 done = False
 clock = pygame.time.Clock()
 fps = 25
+Menu.main_menu()
 game = Tetris(20, 10)
+game.music()
+go = mixer.Sound("sounds\\clear.wav")
+mixer.Sound.set_volume(go,0.04)
 counter = 0
+stop = 1
 
 pressing_down = False
 
@@ -167,7 +244,7 @@ while not done:
     if counter > 100000:
         counter = 0
 
-    if counter % (fps // game.level // 2) == 0 or pressing_down:
+    if counter % (fps // level // 2) == 0 or pressing_down:
         if game.state == "start":
             game.go_down()
 
@@ -186,6 +263,8 @@ while not done:
             if event.key == pygame.K_SPACE:
                 game.go_space()
             if event.key == pygame.K_ESCAPE:
+                stop = 1
+                game.music()
                 game.__init__(20, 10)
 
         if event.type == pygame.KEYUP:
@@ -221,20 +300,28 @@ while not done:
                                     game.y*2.5 + game.zoom * (i + game.new.x),
                                     game.zoom - 1, game.zoom - 1])
 
-    font = pygame.font.SysFont('Calibri', 25, True, False)
-    font1 = pygame.font.SysFont('Calibri', 50, True, False)
-    text = font.render("Your Score: " + str(game.score), True, WHITE)
+    text = font.render("Your Score:", True, WHITE)
+    text1 = font.render(str(game.score), True, WHITE)
     text2 = font.render("Next shape: ", True, WHITE)
     text_game_over = font1.render("Game Over", True, (255, 125, 0))
     text_game_over1 = font1.render("Press ESC to reset", True, (255, 215, 0))
 
-    screen.blit(text, [0, 0])
-    screen.blit(text2, [335, 175])
+    text_rect = text.get_rect()
+    score_rect = text1.get_rect()
+    next_rect = text2.get_rect()
+
+    screen.blit(text, [400-(text_rect[2]/2), 100])
+    screen.blit(text1, [400-(score_rect[2]/2), 120])
+    screen.blit(text2, [400-(next_rect[2]/2), 175])
     if game.state == "gameover":
         screen.fill(BLACK)
         screen.blit(text_game_over, [125, 200])
         screen.blit(text, [175-(5*(len(str(game.score)))-1), 250])
         screen.blit(text_game_over1, [65, 275])
+        mixer.music.stop()
+        if stop == 1:
+            go.play()
+            stop = 0
     pygame.display.flip()
     clock.tick(fps)
 
