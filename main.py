@@ -12,16 +12,20 @@ GRAY = (128, 128, 128)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+ORANGE = (255, 165, 0)
+CYAN = (0, 255, 255)
+PURPLE = (138, 43, 226)
 
 colors = [
     None,
-    (0, 255, 255),
+    CYAN,
     RED,
     GREEN,
     BLUE,
-    (255, 165, 0),
-    (138, 43, 226),
-    (255, 255, 0),
+    ORANGE,
+    PURPLE,
+    YELLOW,
 ]
 
 
@@ -254,14 +258,18 @@ while not done:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 game.rotate()
-            if event.key == pygame.K_DOWN:
+            elif event.key == pygame.K_DOWN:
                 pressing_down = True
-            if event.key == pygame.K_LEFT:
+            elif event.key == pygame.K_LEFT:
                 game.go_side(-1)
-            if event.key == pygame.K_RIGHT:
+            elif event.key == pygame.K_RIGHT:
                 game.go_side(1)
-            if event.key == pygame.K_SPACE:
+            elif event.key == pygame.K_SPACE:
                 game.go_space()
+            elif event.key == pygame.K_ESCAPE and game.state == "gameover":
+                stop = 1
+                game.music()
+                game.__init__(20, 10)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
@@ -299,29 +307,30 @@ while not done:
     text = font.render("Your Score:", True, WHITE)
     text1 = font.render(str(game.score), True, WHITE)
     text2 = font.render("Next shape: ", True, WHITE)
-    text_game_over = font1.render("Game Over", True, (255, 125, 0))
-    text_game_over1 = font1.render("Press ESC to reset", True, (255, 215, 0))
+    text3 = font.render("Your Score: " + str(game.score), True, WHITE)
+    text_game_over = font1.render("Game Over", True, ORANGE)
+    text_game_over1 = font1.render("Press ESC to reset", True, YELLOW)
 
     text_rect = text.get_rect()
     score_rect = text1.get_rect()
     next_rect = text2.get_rect()
+
+    go_rect = text_game_over.get_rect()
+    score2_rect = text3.get_rect()
+    go1_rect = text_game_over1.get_rect()
 
     screen.blit(text, [400-(text_rect[2]/2), 100])
     screen.blit(text1, [400-(score_rect[2]/2), 120])
     screen.blit(text2, [400-(next_rect[2]/2), 175])
     if game.state == "gameover":
         screen.fill(BLACK)
-        screen.blit(text_game_over, [125, 200])
-        screen.blit(text, [175-(5*(len(str(game.score)))-1), 250])
-        screen.blit(text_game_over1, [65, 275])
+        screen.blit(text_game_over, [(width/2 - (go_rect[2]/2)), 200])
+        screen.blit(text3, [(width/2 - (score2_rect[2]/2)), 250])
+        screen.blit(text_game_over1, [(width/2 - (go1_rect[2]/2)), 275])
         mixer.music.stop()
         if stop == 1:
             go.play()
             stop = 0
-        if event.key == pygame.K_ESCAPE:
-            stop = 1
-            game.music()
-            game.__init__(20, 10)
     pygame.display.flip()
     clock.tick(fps)
 
