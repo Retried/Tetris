@@ -208,7 +208,7 @@ class Tetris:
 
     def music(self):
         mixer.music.set_volume(0.04)
-        mixer.music.load("sounds\\music.wav")
+        mixer.music.load("sounds\\music.mp3")
         mixer.music.play(-1)
 
 
@@ -262,10 +262,6 @@ while not done:
                 game.go_side(1)
             if event.key == pygame.K_SPACE:
                 game.go_space()
-            if event.key == pygame.K_ESCAPE:
-                stop = 1
-                game.music()
-                game.__init__(20, 10)
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
@@ -322,6 +318,10 @@ while not done:
         if stop == 1:
             go.play()
             stop = 0
+        if event.key == pygame.K_ESCAPE:
+            stop = 1
+            game.music()
+            game.__init__(20, 10)
     pygame.display.flip()
     clock.tick(fps)
 
