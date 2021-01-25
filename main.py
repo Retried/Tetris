@@ -52,6 +52,9 @@ class Tetris:
     zoom = 20
     new = Figure()
     figure = Figure()
+    figure = new
+    while figure.type == new.type:
+        new = Figure()
 
 
 
@@ -215,7 +218,7 @@ while not done:
                 if p in game.new.image():
                     pygame.draw.rect(screen, colors[game.new.color],
                                     [game.x*3 + game.zoom * (j + game.new.x),
-                                    game.y*3 + game.zoom * (i + game.new.x),
+                                    game.y*2.5 + game.zoom * (i + game.new.x),
                                     game.zoom - 1, game.zoom - 1])
 
     font = pygame.font.SysFont('Calibri', 25, True, False)
@@ -226,7 +229,7 @@ while not done:
     text_game_over1 = font1.render("Press ESC to reset", True, (255, 215, 0))
 
     screen.blit(text, [0, 0])
-    screen.blit(text2, [335, 150])
+    screen.blit(text2, [335, 175])
     if game.state == "gameover":
         screen.fill(BLACK)
         screen.blit(text_game_over, [125, 200])
