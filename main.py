@@ -29,29 +29,27 @@ colors = [
 ]
 
 
-
 class Menu:
 
-    def main_menu():
-        menu=True
+    def __init__(self):
+        menu = True
 
         global level
 
         while menu:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event1 in pygame.event.get():
+                if event1.type == pygame.QUIT:
                     pygame.quit()
-                    quit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_UP:
+                if event1.type == pygame.KEYDOWN:
+                    if event1.key == pygame.K_UP:
                         if level > 1:
                             level -= 1
-                    elif event.key == pygame.K_DOWN:
+                    elif event1.key == pygame.K_DOWN:
                         if level < 3:
                             level += 1
-                    if event.key == pygame.K_RETURN:
+                    if event1.key == pygame.K_RETURN:
                         menu = False
-                        break;
+                        break
 
             screen.fill(BLACK)
             text_menu = font2.render("Choose difficulty:", True, BLUE)
@@ -73,15 +71,15 @@ class Menu:
             normal_rect = text_normal.get_rect()
             hard_rect = text_hard.get_rect()
 
-            screen.blit(text_menu, (width/2 - (menu_rect[2]/2), 150))
-            screen.blit(text_easy, (width/2 - (easy_rect[2]/2) , 200))
-            screen.blit(text_normal, (width/2 - (normal_rect[2]/2) , 225))
-            screen.blit(text_hard, (width/2 - (hard_rect[2]/2) , 250))
+            screen.blit(text_menu, (width / 2 - (menu_rect[2] / 2), 150))
+            screen.blit(text_easy, (width / 2 - (easy_rect[2] / 2), 200))
+            screen.blit(text_normal, (width / 2 - (normal_rect[2] / 2), 225))
+            screen.blit(text_hard, (width / 2 - (hard_rect[2] / 2), 250))
             pygame.display.update()
             clock.tick(fps)
 
-class Figure:
 
+class Figure:
     tetromino = [
         [[1, 5, 9, 13], [4, 5, 6, 7]],
         [[4, 5, 9, 10], [2, 6, 5, 9]],
@@ -105,30 +103,28 @@ class Figure:
     def rotate(self):
         self.rotation = (self.rotation + 1) % len(self.tetromino[self.type])
 
+
 class Tetris:
     score = 0
     state = "start"
     field = []
-    height = 0
-    width = 0
     x = 100
     y = 60
     zoom = 20
     new = Figure()
-    figure = Figure()
     figure = new
     while figure.type == new.type:
         new = Figure()
 
-    def __init__(self, height, width):
-        self.height = height
-        self.width = width
+    def __init__(self, h, w):
+        self.height = h
+        self.width = w
         self.field = []
         self.score = 0
         self.state = "start"
-        for i in range(height):
+        for i1 in range(height):
             new_line = []
-            for j in range(width):
+            for j1 in range(width):
                 new_line.append(0)
             self.field.append(new_line)
 
@@ -139,28 +135,28 @@ class Tetris:
 
     def intersects(self):
         intersection = False
-        for i in range(4):
-            for j in range(4):
-                if i * 4 + j in self.figure.image():
-                    if i + self.figure.y > self.height - 1 or \
-                            j + self.figure.x > self.width - 1 or \
-                            j + self.figure.x < 0 or \
-                            self.field[i + self.figure.y][j + self.figure.x] > 0:
+        for i2 in range(4):
+            for j2 in range(4):
+                if i2 * 4 + j2 in self.figure.image():
+                    if i2 + self.figure.y > self.height - 1 or \
+                            j2 + self.figure.x > self.width - 1 or \
+                            j2 + self.figure.x < 0 or \
+                            self.field[i2 + self.figure.y][j2 + self.figure.x] > 0:
                         intersection = True
         return intersection
 
     def break_lines(self):
         lines = 0
-        for i in range(1, self.height):
+        for i3 in range(1, self.height):
             zeros = 0
-            for j in range(self.width):
-                if self.field[i][j] == 0:
+            for j3 in range(self.width):
+                if self.field[i3][j3] == 0:
                     zeros += 1
             if zeros == 0:
                 lines += 10
-                for k in range(i, 1, -1):
-                    for j in range(self.width):
-                        self.field[k][j] = self.field[k - 1][j]
+                for k3 in range(i3, 1, -1):
+                    for j3 in range(self.width):
+                        self.field[k3][j3] = self.field[k3 - 1][j3]
         self.score += lines ** 2
 
     def space(self):
@@ -177,10 +173,10 @@ class Tetris:
             self.freeze()
 
     def freeze(self):
-        for i in range(4):
-            for j in range(4):
-                if i * 4 + j in self.figure.image():
-                    self.field[i + self.figure.y][j + self.figure.x] = self.figure.color
+        for i4 in range(4):
+            for j4 in range(4):
+                if i4 * 4 + j4 in self.figure.image():
+                    self.field[i4 + self.figure.y][j4 + self.figure.x] = self.figure.color
         self.break_lines()
         self.new_figure()
         if self.intersects():
@@ -202,14 +198,16 @@ class Tetris:
         if self.intersects():
             self.figure.rotation = old_rotation
 
-    def music(self):
+    @staticmethod
+    def music():
         mixer.music.set_volume(0.04)
         mixer.music.load("sounds\\music.mp3")
         mixer.music.play(-1)
 
+
 pygame.init()
 
-screen = pygame.display.set_mode((width,height))
+screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Tetris")
 
 font = pygame.font.SysFont('Calibri', 25, True, False)
@@ -219,11 +217,11 @@ font2 = pygame.font.SysFont('Calibri', 35, True, False)
 done = False
 clock = pygame.time.Clock()
 fps = 25
-Menu.main_menu()
+Menu()
 game = Tetris(20, 10)
 game.music()
 go = mixer.Sound("sounds\\clear.wav")
-mixer.Sound.set_volume(go,0.04)
+mixer.Sound.set_volume(go, 0.04)
 counter = 0
 stop = 1
 
@@ -238,57 +236,57 @@ while not done:
         if game.state == "start":
             game.down()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+    for event2 in pygame.event.get():
+        if event2.type == pygame.QUIT:
             done = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
+        if event2.type == pygame.KEYDOWN:
+            if event2.key == pygame.K_UP:
                 game.rotate()
-            elif event.key == pygame.K_DOWN:
+            elif event2.key == pygame.K_DOWN:
                 pressing_down = True
-            elif event.key == pygame.K_LEFT:
+            elif event2.key == pygame.K_LEFT:
                 game.move_side(-1)
-            elif event.key == pygame.K_RIGHT:
+            elif event2.key == pygame.K_RIGHT:
                 game.move_side(1)
-            elif event.key == pygame.K_SPACE:
+            elif event2.key == pygame.K_SPACE:
                 game.space()
-            elif event.key == pygame.K_ESCAPE and game.state == "gameover":
+            elif event2.key == pygame.K_ESCAPE and game.state == "gameover":
                 stop = 1
                 game.music()
                 game.__init__(20, 10)
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_DOWN:
+        if event2.type == pygame.KEYUP:
+            if event2.key == pygame.K_DOWN:
                 pressing_down = False
 
     screen.fill(BLACK)
 
-    for i in range(game.height):
-        for j in range(game.width):
+    for i5 in range(game.height):
+        for j5 in range(game.width):
             pygame.draw.rect(screen, GRAY,
-                                [game.x + game.zoom * j,
-                                game.y + game.zoom * i,
-                                game.zoom, game.zoom],border_radius= 3)
-            if game.field[i][j] > 0:
-                pygame.draw.rect(screen, colors[game.field[i][j]],
-                                [game.x + game.zoom * j + 1,
-                                game.y + game.zoom * i + 1,
-                                game.zoom - 1, game.zoom - 1])
+                             [game.x + game.zoom * j5,
+                              game.y + game.zoom * i5,
+                              game.zoom, game.zoom], border_radius=3)
+            if game.field[i5][j5] > 0:
+                pygame.draw.rect(screen, colors[game.field[i5][j5]],
+                                 [game.x + game.zoom * j5 + 1,
+                                  game.y + game.zoom * i5 + 1,
+                                  game.zoom - 1, game.zoom - 1])
 
     if game.figure is not None:
-        for i in range(4):
-            for j in range(4):
-                p = i * 4 + j
+        for i6 in range(4):
+            for j6 in range(4):
+                p = i6 * 4 + j6
                 if p in game.figure.image():
                     pygame.draw.rect(screen, colors[game.figure.color],
-                                    [game.x + game.zoom * (j + game.figure.x) + 1,
-                                    game.y + game.zoom * (i + game.figure.y) + 1,
-                                    game.zoom - 1, game.zoom - 1])
+                                     [game.x + game.zoom * (j6 + game.figure.x) + 1,
+                                      game.y + game.zoom * (i6 + game.figure.y) + 1,
+                                      game.zoom - 1, game.zoom - 1])
                 if p in game.new.image():
                     pygame.draw.rect(screen, colors[game.new.color],
-                                    [game.x*3 + game.zoom * (j + game.new.x),
-                                    game.y*2.5 + game.zoom * (i + game.new.x),
-                                    game.zoom - 1, game.zoom - 1])
+                                     [game.x * 3 + game.zoom * (j6 + game.new.x),
+                                      game.y * 2.5 + game.zoom * (i6 + game.new.x),
+                                      game.zoom - 1, game.zoom - 1])
 
     score_text = font.render("Your Score:", True, WHITE)
     points_text = font.render(str(game.score), True, WHITE)
@@ -304,14 +302,14 @@ while not done:
     score2_rect = sp_text.get_rect()
     go1_rect = go_text2.get_rect()
 
-    screen.blit(score_text, [400-(text_rect[2]/2), 100])
-    screen.blit(points_text, [400-(score_rect[2]/2), 120])
-    screen.blit(shape_text, [400-(next_rect[2]/2), 175])
+    screen.blit(score_text, [400 - (text_rect[2] / 2), 100])
+    screen.blit(points_text, [400 - (score_rect[2] / 2), 120])
+    screen.blit(shape_text, [400 - (next_rect[2] / 2), 175])
     if game.state == "gameover":
         screen.fill(BLACK)
-        screen.blit(go_text1, [(width/2 - (go_rect[2]/2)), 200])
-        screen.blit(sp_text, [(width/2 - (score2_rect[2]/2)), 250])
-        screen.blit(go_text2, [(width/2 - (go1_rect[2]/2)), 275])
+        screen.blit(go_text1, [(width / 2 - (go_rect[2] / 2)), 200])
+        screen.blit(sp_text, [(width / 2 - (score2_rect[2] / 2)), 250])
+        screen.blit(go_text2, [(width / 2 - (go1_rect[2] / 2)), 275])
         mixer.music.stop()
         if stop == 1:
             go.play()
