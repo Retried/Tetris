@@ -5,6 +5,7 @@ from pygame import mixer
 level = 2
 width = 500
 height = 500
+done = False
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -35,11 +36,14 @@ class Menu:
         menu = True
 
         global level
+        global done
 
         while menu:
             for event1 in pygame.event.get():
                 if event1.type == pygame.QUIT:
-                    pygame.quit()
+                    done = True
+                    menu = False
+                    break
                 if event1.type == pygame.KEYDOWN:
                     if event1.key == pygame.K_UP:
                         if level > 1:
@@ -214,7 +218,6 @@ font = pygame.font.SysFont('Calibri', 25, True, False)
 font1 = pygame.font.SysFont('Calibri', 50, True, False)
 font2 = pygame.font.SysFont('Calibri', 35, True, False)
 
-done = False
 clock = pygame.time.Clock()
 fps = 25
 Menu()
