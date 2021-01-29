@@ -68,14 +68,11 @@ class Menu:
             else:
                 text_hard = font.render("Hard", True, GRAY)
 
-
             menu_rect = text_menu.get_rect()
             easy_rect = text_easy.get_rect()
             normal_rect = text_normal.get_rect()
             hard_rect = text_hard.get_rect()
 
-
-            # Main Menu Text
             screen.blit(text_menu, (width/2 - (menu_rect[2]/2), 150))
             screen.blit(text_easy, (width/2 - (easy_rect[2]/2) , 200))
             screen.blit(text_normal, (width/2 - (normal_rect[2]/2) , 225))
@@ -83,11 +80,9 @@ class Menu:
             pygame.display.update()
             clock.tick(fps)
 
-
 class Figure:
 
-
-    figures = [
+    tetromino = [
         [[1, 5, 9, 13], [4, 5, 6, 7]],
         [[4, 5, 9, 10], [2, 6, 5, 9]],
         [[6, 7, 9, 10], [1, 5, 6, 10]],
@@ -100,16 +95,15 @@ class Figure:
     def __init__(self):
         self.x = 3
         self.y = 0
-        self.type = random.randint(0, len(self.figures) - 1)
+        self.type = random.randint(0, len(self.tetromino) - 1)
         self.color = self.type + 1
         self.rotation = 0
 
     def image(self):
-        return self.figures[self.type][self.rotation]
+        return self.tetromino[self.type][self.rotation]
 
     def rotate(self):
-        self.rotation = (self.rotation + 1) % len(self.figures[self.type])
-
+        self.rotation = (self.rotation + 1) % len(self.tetromino[self.type])
 
 class Tetris:
     score = 0
@@ -125,8 +119,6 @@ class Tetris:
     figure = new
     while figure.type == new.type:
         new = Figure()
-
-
 
     def __init__(self, height, width):
         self.height = height
@@ -166,19 +158,19 @@ class Tetris:
                     zeros += 1
             if zeros == 0:
                 lines += 10
-                for i1 in range(i, 1, -1):
+                for k in range(i, 1, -1):
                     for j in range(self.width):
-                        self.field[i1][j] = self.field[i1 - 1][j]
+                        self.field[k][j] = self.field[k - 1][j]
         self.score += lines ** 2
 
-    def go_space(self):
+    def space(self):
         if game.state != "gameover":
             while not self.intersects():
                 self.figure.y += 1
             self.figure.y -= 1
             self.freeze()
 
-    def go_down(self):
+    def down(self):
         self.figure.y += 1
         if self.intersects():
             self.figure.y -= 1
@@ -194,7 +186,7 @@ class Tetris:
         if self.intersects():
             self.state = "gameover"
 
-    def go_side(self, dx):
+    def move_side(self, dx):
         move_sound = mixer.Sound("sounds\\move.wav")
         mixer.Sound.set_volume(move_sound, 0.04)
         if game.state != "gameover":
@@ -215,9 +207,6 @@ class Tetris:
         mixer.music.load("sounds\\music.mp3")
         mixer.music.play(-1)
 
-
-
-# Initialize the game engine
 pygame.init()
 
 screen = pygame.display.set_mode((width,height))
@@ -227,7 +216,6 @@ font = pygame.font.SysFont('Calibri', 25, True, False)
 font1 = pygame.font.SysFont('Calibri', 50, True, False)
 font2 = pygame.font.SysFont('Calibri', 35, True, False)
 
-# Loop until the user clicks the close button.
 done = False
 clock = pygame.time.Clock()
 fps = 25
@@ -242,15 +230,13 @@ stop = 1
 pressing_down = False
 
 while not done:
-    #if game.figure is None:
-    #    game.new_figure()
     counter += 1
     if counter > 100000:
         counter = 0
 
     if counter % (fps // level // 2) == 0 or pressing_down:
         if game.state == "start":
-            game.go_down()
+            game.down()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -261,11 +247,11 @@ while not done:
             elif event.key == pygame.K_DOWN:
                 pressing_down = True
             elif event.key == pygame.K_LEFT:
-                game.go_side(-1)
+                game.move_side(-1)
             elif event.key == pygame.K_RIGHT:
-                game.go_side(1)
+                game.move_side(1)
             elif event.key == pygame.K_SPACE:
-                game.go_space()
+                game.space()
             elif event.key == pygame.K_ESCAPE and game.state == "gameover":
                 stop = 1
                 game.music()
@@ -304,29 +290,28 @@ while not done:
                                     game.y*2.5 + game.zoom * (i + game.new.x),
                                     game.zoom - 1, game.zoom - 1])
 
-    text = font.render("Your Score:", True, WHITE)
-    text1 = font.render(str(game.score), True, WHITE)
-    text2 = font.render("Next shape: ", True, WHITE)
-    text3 = font.render("Your Score: " + str(game.score), True, WHITE)
-    text_game_over = font1.render("Game Over", True, ORANGE)
-    text_game_over1 = font1.render("Press ESC to reset", True, YELLOW)
+    score_text = font.render("Your Score:", True, WHITE)
+    points_text = font.render(str(game.score), True, WHITE)
+    shape_text = font.render("Next shape: ", True, WHITE)
+    sp_text = font.render("Your Score: " + str(game.score), True, WHITE)
+    go_text1 = font1.render("Game Over", True, ORANGE)
+    go_text2 = font1.render("Press ESC to reset", True, YELLOW)
 
-    text_rect = text.get_rect()
-    score_rect = text1.get_rect()
-    next_rect = text2.get_rect()
+    text_rect = score_text.get_rect()
+    score_rect = points_text.get_rect()
+    next_rect = shape_text.get_rect()
+    go_rect = go_text1.get_rect()
+    score2_rect = sp_text.get_rect()
+    go1_rect = go_text2.get_rect()
 
-    go_rect = text_game_over.get_rect()
-    score2_rect = text3.get_rect()
-    go1_rect = text_game_over1.get_rect()
-
-    screen.blit(text, [400-(text_rect[2]/2), 100])
-    screen.blit(text1, [400-(score_rect[2]/2), 120])
-    screen.blit(text2, [400-(next_rect[2]/2), 175])
+    screen.blit(score_text, [400-(text_rect[2]/2), 100])
+    screen.blit(points_text, [400-(score_rect[2]/2), 120])
+    screen.blit(shape_text, [400-(next_rect[2]/2), 175])
     if game.state == "gameover":
         screen.fill(BLACK)
-        screen.blit(text_game_over, [(width/2 - (go_rect[2]/2)), 200])
-        screen.blit(text3, [(width/2 - (score2_rect[2]/2)), 250])
-        screen.blit(text_game_over1, [(width/2 - (go1_rect[2]/2)), 275])
+        screen.blit(go_text1, [(width/2 - (go_rect[2]/2)), 200])
+        screen.blit(sp_text, [(width/2 - (score2_rect[2]/2)), 250])
+        screen.blit(go_text2, [(width/2 - (go1_rect[2]/2)), 275])
         mixer.music.stop()
         if stop == 1:
             go.play()
